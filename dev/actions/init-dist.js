@@ -1,0 +1,1 @@
+require("./write-js").writeJS();
