@@ -1,21 +1,15 @@
 import { Node } from "@babel/core";
 import { FunctionExpression } from "@babel/types";
-import { getLibs } from "../safe-libs";
+import * as esTree from "estree-walker";
+import babelGenerator from "@babel/generator";
+import babelParse from "@babel/parser";
 
-const libs = getLibs({
-  "estree-walker": () => require("estree-walker"),
-  "@babel/generator": () => require("@babel/generator").default,
-  "@babel/parser": () => require("@babel/parser"),
-});
-
-const babelGenerator = libs["@babel/generator"];
-const babelParse = libs["@babel/parser"];
 // ----------------------------------------------
 export default () => ({
   babel: { astToCode, codeToAst, walk, findNode },
 });
 // ----------------------------------------------
-const { walk: babelWalk } = libs["estree-walker"];
+const { walk: babelWalk } = esTree;
 
 // ----------------------------------------------
 const ast = babelParse.parse("var name;", {
@@ -38,7 +32,7 @@ const walk = babelWalk as any as (
   walker: { enter?: NewSyncHandler; leave?: NewSyncHandler }
 ) => Node | null;
 
-const findNode = <T>(
+const findNode = <T,>(
   callback: (done: (value: T) => void) => any,
   fail: any
 ) => {
@@ -55,7 +49,7 @@ const findNode = <T>(
     if (error === errDone) return result;
     throw fail;
   }
-  return result
+  return result;
 };
 // ----------------------------------------------
 type NewSyncHandler = (

@@ -8,8 +8,13 @@ async function main() {
   const { read: readArgs, missingArgs } = utils.args;
   const exec = utils.exec.run;
   const { log } = utils.LogTime();
+
+  const defaultVersion = (
+    await utils.file.readJSON(path.join(dirDefines.projectDir, "package.json"))
+  ).version;
+
   const [args] = readArgs({ v: "version" });
-  const versionUp = args.version?.[0];
+  const versionUp = args.version?.[0] || defaultVersion;
 
   if (!versionUp)
     return missingArgs("version", "-v, --version: release version");
@@ -23,6 +28,7 @@ async function main() {
   );
   if (existsSync(distBuildTgzPath)) await fs.rm(distBuildTgzPath);
   await exec("npm pack", dirDefines.distDir);
+
   const releaseName = path.basename(distBuildTgzPath);
   const uploadCLI = `gh release upload ${versionUp} ${distBuildTgzPath}`;
   const deleteCLI = `gh release delete-asset ${versionUp} ${releaseName}`;
@@ -30,5 +36,7 @@ async function main() {
   await exec(deleteCLI).safe();
   log("upload", distBuildTgzPath);
   await exec(uploadCLI);
+  await fs.rm(distBuildTgzPath)
+  log('done')
 }
 main();

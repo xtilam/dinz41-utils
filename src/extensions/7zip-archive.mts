@@ -1,12 +1,9 @@
-import childProcess from "./child-process";
+import childProcess from "./child-process.mjs";
 import { spawn } from "child_process";
-import { getLibs } from "../safe-libs";
 import fs from "fs/promises";
-import "../plugins/safe-promise";
+import "../plugins/safe-promise.mjs";
+import _7zbin from "7zip-bin";
 
-const libs = getLibs({
-  "7zip-bin": () => require("7zip-bin"),
-});
 // ----------------------------------------------
 export default () => ({
   sevenZipArchive: {
@@ -19,7 +16,5 @@ async function sevenZipFolder(sourceDir, destinationFilePath: string) {
   const { waitTask } = childProcess();
   if (desStats) await fs.rm(destinationFilePath, { recursive: true });
 
-  await waitTask(
-    spawn(libs["7zip-bin"].path7za, ["a", destinationFilePath, sourceDir])
-  );
+  await waitTask(spawn(_7zbin.path7za, ["a", destinationFilePath, sourceDir]));
 }
