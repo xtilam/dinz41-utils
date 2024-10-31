@@ -15,6 +15,5 @@ async function sevenZipFolder(sourceDir, destinationFilePath: string) {
   const [desStats] = await fs.stat(destinationFilePath).safe();
   const { waitTask } = childProcess();
   if (desStats) await fs.rm(destinationFilePath, { recursive: true });
-
   await waitTask(spawn(_7zbin.path7za, ["a", destinationFilePath, sourceDir]));
 }

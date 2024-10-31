@@ -9,12 +9,8 @@ async function main() {
   const exec = utils.exec.run;
   const { log } = utils.LogTime();
 
-  const defaultVersion = (
-    await utils.file.readJSON(path.join(dirDefines.projectDir, "package.json"))
-  ).version;
-
   const [args] = readArgs({ v: "version" });
-  const versionUp = args.version?.[0] || defaultVersion;
+  const versionUp = args.version?.[0];
 
   if (!versionUp)
     return missingArgs("version", "-v, --version: release version");
@@ -22,6 +18,7 @@ async function main() {
   const packageJSON = await utils.file.readJSON(
     path.join(dirDefines.projectDir, "package.json")
   );
+  packageJSON.name = packageJSON.name.replace("@", "").replace("/", "-");
   const distBuildTgzPath = path.join(
     dirDefines.distDir,
     `${packageJSON.name}-${packageJSON.version}.tgz`
@@ -36,7 +33,7 @@ async function main() {
   await exec(deleteCLI).safe();
   log("upload", distBuildTgzPath);
   await exec(uploadCLI);
-  await fs.rm(distBuildTgzPath)
-  log('done')
+  await fs.rm(distBuildTgzPath);
+  log("done");
 }
 main();

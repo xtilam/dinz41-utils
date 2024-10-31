@@ -25,7 +25,8 @@ interface IPromiseWrapper<T> {
 export type PromiseWrapper<T> = readonly [T, any] & IPromiseWrapper<T>;
 export default () => ({
   promise: {
-    init: <T = void,>(): IPromiseWrapper<T> =>
-      new _PromiseWrapper<T>() as any as PromiseWrapper<T>,
+    init<T = void>() {
+      return new _PromiseWrapper<T>() as any as PromiseWrapper<T>;
+    },
   },
 });
